@@ -15,6 +15,9 @@ if (!defined('DC_RC_PATH')) { return; }
 
 class dcPage extends dcPageOrig
 {
+	private static $loaded_css=array();
+	private static $loaded_js=array();
+	
 	public static function jsDatePicker()
 	{
 		global $core,$dcc_dir;
@@ -45,7 +48,11 @@ class dcPage extends dcPageOrig
 		$cssfile="$path/$css_path/$file";
 		$cachedir="$dcc_dir/cache/$css_path/";
 		$cachefile="$cachedir/$file";
-		
+
+		$escaped_src = html::escapeHTML($cachefile);
+		if(isset(self::$loaded_css[$escaped_src])){
+			return;
+		}
 		if(!file_exists($cssfile)){
 			return '';
 		}
@@ -58,7 +65,7 @@ class dcPage extends dcPageOrig
 			$css=  preg_replace('/url\((\"|\')([^\1]*)\1\)/U','url(\1'.$p_url.$css_path.'\2\1)',file_get_contents($path."/".$css_path."/".$file));
 			file_put_contents("$cachefile", $css);
 		}
-
+		self::$loaded_css[$escaped_src]=true;
 		return "<link rel=\"stylesheet\" type=\"text/css\" href=\"$p_url/cache/$css_path/$file\">\n";
 	}
 	
@@ -82,12 +89,14 @@ class dcPage extends dcPageOrig
 		global $dcc_dir;
 		global $dcc_pfurl;
 		$jsfile="$path/$js_path/$file";
-		$cachedir="$dcc_dir/cache/$js_path/";
+		$cachedir="$dcc_dir/cache/$js_path";
 		$cachefile="$cachedir/__$file";
 		$pf_cachefile="$dcc_pfurl/cache/$js_path/__$file";
 		$pf_jsfile="$pf_url/$js_path/$file";
 		$pf_jsgettext="$dcc_pfurl/js/jsgettext.js";
 		
+		$escaped_src = html::escapeHTML($cachefile);
+		if(isset(self::$loaded_js[$escaped_src])) return;
 		if(!file_exists($jsfile)){
 			return '';
 		}
@@ -117,121 +126,10 @@ if($var===undefined)
 			file_put_contents($cachefile, $gtstring);
 			chmod($cachefile,0664);
 		}
+		self::$loaded_js[$escaped_src]=true;
 		return self::jsLoad("$pf_jsgettext").self::jsLoad("$pf_cachefile").self::jsLoad($pf_jsfile)."\n";
 	}
 	
-	/***
-	 * js gettext support
-	 * 
-	 * extracts all __("") strings from the given js file and creates a js file 
-	 * with all the translated strings stored in $var js object.
-	 * this file is cached and updated only on js file change. 
-	 * prints the code to insert the translation + the js file.
-	 * 
-	 * @param string	$path		base disk path (plugin main directory)
-	 * @param string	$p_url		plugin url
-	 * @param string	$js_path	js subdirectory
-	 * @param string	$file		js filename
-	 * @param string	$var		js variable to store the translated strings in
-	 */
-
-	public static function jsGettext($path,$pf_url,$js_path,$file,$var)
-	{
-		global $dcc_dir;
-		global $dcc_pfurl;
-		$jsfile="$path/$js_path/$file";
-		$cachedir="$dcc_dir/cache/$js_path/";
-		$cachefile="$cachedir/__$file";
-		$pf_cachefile="$dcc_pfurl/cache/$js_path/$file";
-		$pf_jsfile="$pf_url/$js_path/$file";
-		$pf_jsgettext="$dcc_pfurl/js/jsgettext.js";
-		
-		if(!file_exists($jsfile)){
-			return '';
-		}
-		if(!file_exists($cachefile) || (filemtime($jsfile)>filemtime($cachefile))){
-			if(!file_exists($cachedir)){
-				if(!mkdir($cachedir,0755,true)) throw new Exception("dcPage::jsGettext : can't create $cachedir.");
-			}else if(!is_dir($cachedir)){
-				throw new Exception("dcPage::jsGettext : can't create $cachedir, already exists and is not a directory.");
-			}
-
-			$jsfic=file_get_contents($jsfile);
-			$gtstrings = array();
-			if($var===undefined)
-				var $var={};
-			";
-			$pat='/_{2}\(([\'"])(.+)\1(?:\s*,\s*([\'"])(.*)\3\s*,[^\)]*)?\)/U';
-			if(preg_match_all($pat, $jsfic,$gtstrings)){
-				foreach ($gtstrings[2] as $k => $v) {
-					$gtstring.=self::jsVar($var."['".$v."']", __($v));
-				}
-				foreach ($gtstrings[4] as $k => $v) {
-					if($v!="")
-						$gtstring.=self::jsVar($var."['".$v."']", __($v));					
-				}
-			}
-			file_put_contents($cachefile, $gtstring);
-		}
-		return self::jsLoad("$pf_jsgettext").self::jsLoad("$pf_cachefile").self::jsLoad($pf_jsfile)."\n";
-	}
-	
-	/***
-	 * js gettext support
-	 * 
-	 * extracts all __("") strings from the given js file and creates a js file 
-	 * with all the translated strings stored in $var js object.
-	 * this file is cached and updated only on js file change. 
-	 * prints the code to insert the translation + the js file.
-	 * 
-	 * @param string	$path		base disk path (plugin main directory)
-	 * @param string	$p_url		plugin url
-	 * @param string	$js_path	js subdirectory
-	 * @param string	$file		js filename
-	 * @param string	$var		js variable to store the translated strings in
-	 */
-
-	public static function jsGettext($path,$pf_url,$js_path,$file,$var)
-	{
-		global $dcc_dir;
-		global $dcc_pfurl;
-		$jsfile="$path/$js_path/$file";
-		$cachedir="$dcc_dir/cache/$js_path/";
-		$cachefile="$cachedir/__$file";
-		$pf_cachefile="$dcc_pfurl/cache/$js_path/$file";
-		$pf_jsfile="$pf_url/$js_path/$file";
-		$pf_jsgettext="$dcc_pfurl/js/jsgettext.js";
-		
-		if(!file_exists($jsfile)){
-			return '';
-		}
-		if(!file_exists($cachefile) || (filemtime($jsfile)>filemtime($cachefile))){
-			if(!file_exists($cachedir)){
-				if(!mkdir($cachedir,0755,true)) throw new Exception("dcPage::jsGettext : can't create $cachedir.");
-			}else if(!is_dir($cachedir)){
-				throw new Exception("dcPage::jsGettext : can't create $cachedir, already exists and is not a directory.");
-			}
-
-			$jsfic=file_get_contents($jsfile);
-			$gtstrings = array();
-			if($var===undefined)
-				var $var={};
-			";
-			$pat='/_{2}\(([\'"])(.+)\1(?:\s*,\s*([\'"])(.*)\3\s*,[^\)]*)?\)/U';
-			if(preg_match_all($pat, $jsfic,$gtstrings)){
-				foreach ($gtstrings[2] as $k => $v) {
-					$gtstring.=self::jsVar($var."['".$v."']", __($v));
-				}
-				foreach ($gtstrings[4] as $k => $v) {
-					if($v!="")
-						$gtstring.=self::jsVar($var."['".$v."']", __($v));					
-				}
-			}
-			file_put_contents($cachefile, $gtstring);
-		}
-		return self::jsLoad("$pf_jsgettext").self::jsLoad("$pf_cachefile").self::jsLoad($pf_jsfile)."\n";
-	}
-
 	public static function jsCommon()
 	{
 		$pf_url  = 'index.php?pf=dcCustom';
