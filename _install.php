@@ -26,7 +26,7 @@ if(!defined('DC_CUSTOM_UNINSTALL') && version_compare(DC_VERSION,DC_CUSTOM_MIN_D
 
 define("DC_CUSTOM_RCSTART","#Added by dcCustom");
 define("DC_CUSTOM_RCEND","#/Added by dcCustom - Please do not edit this block by hand, install or uninstall dcCustom from plugins panel.");
-define("DC_CUSTOM_RC","if(defined(\"DC_CONTEXT_ADMIN\") && file_exists(\"%1\$s/_prepend.php\"))\n\tinclude_once \"%1\$s/_prepend.php\";");
+define("DC_CUSTOM_RC","if(defined(\"DC_CONTEXT_ADMIN\") && file_exists(\"%1\$s/_prepend.php\") && !file_exists(\"%1\$s/_disabled\"))\n\tinclude_once \"%1\$s/_prepend.php\";");
 $conf_file=file_get_contents(DC_RC_PATH);
 $do=false;
 if($start=strpos($conf_file,DC_CUSTOM_RCSTART)){

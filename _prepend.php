@@ -18,9 +18,9 @@ global $__autoload, $core;
 define('DC_CUSTOM','dcCustom');
 $dcc_dir=dirname(__FILE__);
 $dcc_pfurl="index.php?pf=dcCustom";
+$dc_root=path::real(dirname(DC_RC_PATH).'/..');
 
-if(!file_exists("$dcc_dir/cache/lib.dc.pageorig.php") || (filemtime(DC_ROOT.'/inc/admin/lib.dc.page.php')>filemtime("$dcc_dir/cache/lib.dc.pageorig.php"))){
-	$dc_root=path::real(dirname(DC_RC_PATH).'/..');
+if(!file_exists("$dcc_dir/cache/lib.dc.pageorig.php") || (filemtime("$dc_root/inc/admin/lib.dc.page.php")>filemtime("$dcc_dir/cache/lib.dc.pageorig.php"))){	
 	$dcPageOrig=file_get_contents("$dc_root/inc/admin/lib.dc.page.php");
 	$dcPageOrig=  str_replace("dcPage", "dcPageOrig", $dcPageOrig);
 	file_put_contents("$dcc_dir/cache/lib.dc.pageorig.php", $dcPageOrig);

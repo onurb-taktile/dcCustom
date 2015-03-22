@@ -24,6 +24,8 @@
  */
 
 function __(text, plural, count) {
+	if(dc_messages==undefined)
+		var dc_messages={};
 	var rettext = text;
 	var stripPipes=function(str){
 		var pat=/^([^\|]*(?:\|\|[^\|]*)*)/;
