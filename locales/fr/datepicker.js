@@ -64,4 +64,4 @@ $.timepicker.regional['fr'] = {
 	pmNames: ['PM', 'Pm'],
 	isRTL: false
 };
-$.timepicker.setDefaults($.timepicker.regional['ru']);
+$.timepicker.setDefaults($.timepicker.regional['fr']);
