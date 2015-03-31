@@ -117,7 +117,7 @@ class dcPage extends dcPageOrig {
 			}
 			//_{2}\(([\'"])(.+)\1(?:\s*,\s*([\'"])(.*)\3\s*,([^\)]*))?\)
 			//
-			$pat = '/_{2}\(([\'"])(.+)\1(?:\s*,\s*([\'"])(.*)\3\s*,\s*(([\d\w\.\s\$-]*|(\()?(?(7)(?-3)\)))+))?\)/';
+			$pat = '/_{2}\(([\'"])(?U:(.+))\1(?:\s*,\s*([\'"])(.*)\3\s*,\s*(([\d\w\.\s\$-]*|(\()?(?(7)(?-3)\)))+))?\)/';
 			$trjsfic = preg_replace_callback($pat, function(array $matches) {
 				//first, strip the |comment part from the translated string
 				$singular = preg_replace('/^([^\|]*(?:\|\|[^\|]*)*)(\|.*)?$/', '$1', __($matches[2]));

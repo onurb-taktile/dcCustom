@@ -43,5 +43,6 @@ if(!defined('DC_CUSTOM_UNINSTALL')){
 }
 
 if($do)file_put_contents(DC_RC_PATH, $conf_file);
+@mkdir(dirname(__FILE__)."/cache",0775);
 $core->setVersion('dcCustom',$new_version);
 return true;
