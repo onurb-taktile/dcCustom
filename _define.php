@@ -17,7 +17,7 @@ $this->registerModule(
 	/* Name */			"dcCustom",
 	/* Description*/		"Customize dotclear admin side",
 	/* Author */			"Onurb Teva <dev@taktile.fr>",
-	/* Version */			'2015.03.22',
+	/* Version */			'2015.04.05',
 	/* Permissions */		array(
 								'permissions' =>	'usage,contentadmin',
 								'priority' =>		10,
